@@ -37,7 +37,6 @@ const SignIn = () => {
       const user = JSON.parse(sessionStorage.getItem("userData") || "null");
       if (success) {
         toast.success("Welcome!");
-        console.log("User logged in:", user);
         if (user?.role === "admin") {
           setIsLoading(false);
           navigate("/admin");

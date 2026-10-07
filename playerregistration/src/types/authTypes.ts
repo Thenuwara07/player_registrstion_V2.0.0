@@ -89,6 +89,22 @@ export type User = {
   player: Player | null;
 };
 
+export type PendingPayment = {
+  id: number;
+  userId: number;
+  slipImage: string;
+  referenceNo: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+// GET /auth/:userid. Documents and pendingPayment are only filled in for the
+// player themself and admins.
+export type PlayerProfile = Omit<User, "password"> & {
+  pendingPayment: PendingPayment | null;
+};
+
 export type Player = {
   id: number;
   slbfId: string | null;
@@ -100,10 +116,10 @@ export type Player = {
   idBackImage: string | null;
   closeAssId: number | null;
   closeClubId: number | null;
-  closeClubChangeDate: string | null;
+  closeClubChagngeDate: string | null; // column name as spelled in the database
   openAssId: number | null;
   openClubId: number | null;
-  openClubChangeDate: string | null;
+  openClubChagngeDate: string | null;
   regDate: string | null;
   regExpDate: string | null;
   createdAt: string;
@@ -122,12 +138,20 @@ export type Post = {
   user: User;
 };
 
+// What the post editor sends; the server fills in the author and timestamps
+export type PostInput = Pick<Post, "title" | "content" | "imageName"> & {
+  id?: number;
+  subtitle?: string | null;
+};
+
 export type DefaultDetails = {
   id: number;
   herotitle: string;
   herosubtitle?: string | null;
   imageName?: string | null;
-  openclubchangeperiodMonths: string;
-  userId: string;
+  // Form state holds strings; the server converts both to numbers
+  openclubchangeperiodMonths: number | string;
+  userId: number | string;
+  updatedAt?: string;
 };
 

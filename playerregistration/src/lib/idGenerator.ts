@@ -49,21 +49,6 @@ export function idrestgenerator(
       result += `-${newasscode}`;
     }
   } else {
-    // // Example 2, 3, 4: If old codes are provided, we split by existing parts and reformat
-    // const parts = slbfid.split("-");
-    // const lastPart = parts.pop(); // SLBF-1, SLBF-1-ABC/DEF, SLBF-1-ABC/DEF-GHI/JKI
-    // if (lastPart) {
-    //   result = `SLBF-${lastPart.split("/")[0]}`; // Get first part after splitting by '/'
-    // }
-    // result += `-${newasscode}/${newclubcode}`;
-
-    // let slbfid = "SLBF-1-ABC/DEF-GHI/JKI";
-    // const partToRemove = "-ABC/DEF";
-
-    // // Remove the part
-    // slbfid = slbfid.replace(partToRemove, ""); 
-
-    // console.log(slbfid); // Output: SLBF-1-GHI/JKI
 
     if (oldclubcode){
       const code = `-${oldasscode}/${oldclubcode}`;

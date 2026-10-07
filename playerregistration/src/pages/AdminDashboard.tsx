@@ -216,7 +216,6 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
-  console.log("admins", admins);
 
   const fetchClubchangereq = async () => {
     try {
@@ -229,12 +228,10 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
-  console.log("clubChangeReq", clubChangeReq);
 
   const fetchPostCount = async () => {
     try {
       const postCount = await getPostCount();
-      console.log("postCount", postCount);
       setPostCount(postCount);
     } catch (error) {
       toast.error("Failed to fetch post count", error);
@@ -244,7 +241,6 @@ const AdminDashboard = () => {
   const fetchNotRegisteredPlayerCount = async () => {
     try {
       const count = await getNotRegisteredPlayerCount();
-      console.log("notRegisteredPlayerCount", count);
       setNotRegisteredPlayerCount(count);
       return count;
     } catch (error) {
@@ -254,70 +250,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // const getAssClubdetails = async (
-  //   type: string,
-  //   newAssId: number,
-  //   newclubId?: number,
-  //   oldAssId?: number,
-  //   oldClubId?: number
-  // ) => {
-  //   if (type === "open") {
-  //     if (oldAssId) {
-  //       try {
-  //         setLoading(true);
-  //         const oldAssData = await GetAssDetails(type, oldAssId);
-  //         setOldAssdetails(oldAssData);
-  //         const oldClubData = await GetClubDetails(type, oldAssId, oldClubId);
-  //         setOldclubdetails(oldClubData);
-  //       } catch (error) {
-  //         toast.error("Failed to load new association details.");
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     }
-  //     try {
-  //       setLoading(true);
-  //       const NewAssData = await GetAssDetails(type, newAssId);
-  //       setNewAssdetails(NewAssData);
-  //       const NewClubData = await GetClubDetails(type, newAssId, newclubId);
-  //       setNewclubdetails(NewClubData);
-  //     } catch (error) {
-  //       toast.error("Failed to load new association details.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   } else {
-  //     if (oldAssId) {
-  //       try {
-  //         setLoading(true);
-  //         const oldAssData = await GetAssDetails(type, oldAssId);
-  //         setOldAssdetails(oldAssData);
-  //         if (![1, 2, 3, 7].includes(oldAssId)) {
-  //           const oldClubData = await GetClubDetails(type, oldAssId, oldClubId);
-  //           setOldclubdetails(oldClubData);
-  //         }
-  //       } catch (error) {
-  //         toast.error("Failed to load new association details.");
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     }
-  //     try {
-  //       setLoading(true);
-  //       const NewAssData = await GetAssDetails(type, newAssId);
-  //       setNewAssdetails(NewAssData);
-  //       if (![1, 2, 3, 7].includes(newAssId)) {
-  //         const NewClubData = await GetClubDetails(type, newAssId, newclubId);
-  //         setNewclubdetails(NewClubData);
-  //       }
-  //     } catch (error) {
-  //       toast.error("Failed to load new club details.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
-  console.log("load new association details", newassdetails);
 
   const handleReject = async (data: UpdateTableField) => {
     try {
@@ -370,7 +302,6 @@ const AdminDashboard = () => {
       toast.error("Passwords do not match");
       return;
     }
-    console.log("Creating admin with data:", newAdminData);
     setShowConfirm(true);
     // toast.success("New admin account created successfully!");
   };
@@ -518,13 +449,6 @@ const AdminDashboard = () => {
           expDate: expDate.toISOString(),
         };
         const updatedRegDate = await updateRegDates(reg_expDates);
-        // if (updatedRegDate.success) {
-        //   if (!slbfId || slbfId === "pending") {
-        //     const newslbfId = `SLBF${userId}`;
-        //     const slbfdata = { id: playerId!, table: "player", column: "slbfId", value: newslbfId };
-        //     await updateTableFeild(slbfdata);
-        //   }
-        // }
         toast.success("Payment approved successfully!");
         setShowPaymentdetailsModal(false);
         fetchRegData();
@@ -537,10 +461,10 @@ const AdminDashboard = () => {
   };
 
   const handleClubChangeRequest = async (
-    clubchangeId?: string,
-    playerId?: string,
-    slbfId?: string,
-    type?: string,
+    clubchangeId: string | undefined,
+    playerId: string | undefined,
+    slbfId: string | undefined,
+    type: string | undefined,
     newAssId: number,
     newAss: string,
     newAssCode: string,

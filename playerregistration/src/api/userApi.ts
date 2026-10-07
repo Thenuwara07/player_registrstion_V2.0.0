@@ -1,125 +1,47 @@
-import { PlayerAllData } from "../types/authTypes";
-import { User1, RegRequest , ResponseupdateTableField, ClubRequest, UserUpdateDetails} from "../types/index";
+// Player self-service requests. The server acts on the signed-in player,
+// so no user id is sent.
+import { RegRequest, ResponseupdateTableField, ClubRequest, UserUpdateDetails } from "../types/index";
+import { apiRequest } from "./client";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-const token = sessionStorage.getItem("authToken");
-// console.log("puka", token);
+export const regRequest = (request: RegRequest): Promise<ResponseupdateTableField> =>
+  apiRequest("/user/regrequest", {
+    method: "POST",
+    body: { slipImage: request.slipImage, referenceNo: request.reffernceNo },
+  });
 
-export const regRequest = async (
-  regRequest: RegRequest
-): Promise<ResponseupdateTableField> => {
-  try {
-    // Prepare the payload without changing variable names
-    const payload = {
-      userId: regRequest.userId,
-      slipImage: regRequest.slipImage,
-      referenceNo: regRequest.reffernceNo,
-    };
-    const token = sessionStorage.getItem("authToken");
-    const response = await fetch(`${API_BASE_URL}/user/regrequest`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
+export const userdetailsUpdate = (
+  details: UserUpdateDetails
+): Promise<ResponseupdateTableField> =>
+  apiRequest("/user/updateuserandplayer", {
+    method: "PUT",
+    body: {
+      firstName: details.firstName,
+      email: details.email,
+      contact: details.contact,
+      weight: details.weight,
+      height: details.height,
+    },
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Request failed");
-    }
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("request occur error:", error);
-    throw error;
-  }
-};
-
-export const userdetailsUpdate = async (
-  dataset: UserUpdateDetails
-
-): Promise<ResponseupdateTableField> => {
-  try {
-    // Prepare the payload without changing variable names
-    const payload = {
-      userId: dataset.userId,
-      firstName: dataset.firstName,
-      email: dataset.email,
-      contact: dataset.contact,
-      weight: dataset.weight,
-      height: dataset.height,
-    };
-    console.log("payload---------------yana", payload);
-    const token = sessionStorage.getItem("authToken");
-    const response = await fetch(`${API_BASE_URL}/user/updateuserandplayer`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Request failed");
-    }
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("request occur error:", error);
-    throw error;
-  }
-};
-
-export const clubchangeRequest = async (
-  clubRequest: ClubRequest
-): Promise<ResponseupdateTableField> => {
-  try {
-    // Prepare the payload without changing variable names
-    const payload = {
-      userId: clubRequest.userId,
-      type: clubRequest.type,
-      newImage: clubRequest.newImage,
-      newClubId: clubRequest.newClubId || null,
-      newAssId: clubRequest.newAssId,
-      newClub: clubRequest.newClub || null,
-      newAss: clubRequest.newAss,
-      newClubCode: clubRequest.newClubCode || null,
-      newAssCode: clubRequest.newAssCode,
-      currentImage: clubRequest.currentImage || null,
-      currentClubId: clubRequest.currentClubId || null,
-      currentAssId: clubRequest.currentAssId || null,
-      currentClub: clubRequest.currentClub || null,
-      currentAss: clubRequest.currentAss || null,
-      currentClubCode: clubRequest.currentClubCode || null,
-      currentAssCode: clubRequest.currentAssCode || null,
-      resignDate: clubRequest.resignDate || null,
-    };
-    const token = sessionStorage.getItem("authToken");
-    const response = await fetch(`${API_BASE_URL}/user/clubchange`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Request failed");
-    }
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("request occur error:", error);
-    throw error;
-  }
-};
-
+export const clubchangeRequest = (request: ClubRequest): Promise<ResponseupdateTableField> =>
+  apiRequest("/user/clubchange", {
+    method: "POST",
+    body: {
+      type: request.type,
+      newImage: request.newImage,
+      newClubId: request.newClubId || null,
+      newAssId: request.newAssId,
+      newClub: request.newClub || null,
+      newAss: request.newAss,
+      newClubCode: request.newClubCode || null,
+      newAssCode: request.newAssCode,
+      currentImage: request.currentImage || null,
+      currentClubId: request.currentClubId || null,
+      currentAssId: request.currentAssId || null,
+      currentClub: request.currentClub || null,
+      currentAss: request.currentAss || null,
+      currentClubCode: request.currentClubCode || null,
+      currentAssCode: request.currentAssCode || null,
+      resignDate: request.resignDate || null,
+    },
+  });

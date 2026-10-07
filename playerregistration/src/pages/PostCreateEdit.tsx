@@ -149,7 +149,6 @@ const PostCreateEdit: React.FC = () => {
       };
 
       if (mode === "edit") {
-        console.log("Updating post:", payload);
         // Send only fields that may change; let Prisma set updatedAt
         await updatePost({
           id: payload.id!,
@@ -157,19 +156,14 @@ const PostCreateEdit: React.FC = () => {
           subtitle: payload.subtitle,
           content: payload.content,
           imageName: payload.imageName,
-          // If you want to allow changing createdAt on edit, uncomment:
-          // createdAt: new Date(createdAt),
         });
         toast.success("Post updated.");
       } else {
-        // Backend expects Date for createdAt; convert
         await createPost({
           title: payload.title,
           subtitle: payload.subtitle,
           content: payload.content,
           imageName: payload.imageName,
-          userId: payload.userId,
-          createdAt: new Date(createdAt),
         });
         toast.success("Post created.");
       }

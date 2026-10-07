@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 import { playerDetails } from "@/api/commonApi";
+import type { PlayerProfile } from "@/types/authTypes";
 import { GetAssDetails, GetClubDetails } from "@/api/adminApi";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -53,7 +54,6 @@ const Profile: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, playerInfo]);
-  console.log("addddd User Data:", authUser?.role);
 
   // -------------------- API helpers --------------------
   const getAssClubdetails = async (
@@ -100,7 +100,7 @@ const Profile: React.FC = () => {
         return;
       }
 
-      const playerData: UserShape = await playerDetails(numericId);
+      const playerData: PlayerProfile = await playerDetails(numericId);
       setPlayerInfo(playerData);
 
       await getAssClubdetails(

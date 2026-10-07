@@ -1,4 +1,3 @@
-// src/server/post.controller.ts
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
@@ -29,24 +28,14 @@ function pruneUndefined<T extends Record<string, any>>(obj: T): Partial<T> {
  *  ----------------------*/
 export const createPost = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, subtitle, content, imageName, userId, createdAt } = req.body;
+    const { title, subtitle, content, imageName, createdAt } = req.body;
 
-    // Validate input (imageName is required because your schema has String, not String?)
-    if (!title || !content || !imageName || !userId) {
+    // imageName is required because the schema has String, not String?
+    if (!title || !content || !imageName) {
       res.status(400).json({
         success: false,
-        message: "Missing required fields: title, content, imageName, userId",
+        message: "Missing required fields: title, content, imageName",
       });
-      return;
-    }
-
-    // Ensure author exists (FK safety)
-    const author = await prisma.user.findUnique({
-      where: { id: Number(userId) },
-      select: { id: true },
-    });
-    if (!author) {
-      res.status(400).json({ success: false, message: "User (author) not found" });
       return;
     }
 
@@ -56,7 +45,8 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
         subtitle: subtitle ? String(subtitle).trim() : undefined,
         content: String(content).trim(),
         imageName: String(imageName).trim(),
-        userId: Number(userId),
+        // The author is always the signed-in admin
+        userId: req.user!.id,
         ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
       },
       include: { user: { select: SAFE_USER_SELECT } },

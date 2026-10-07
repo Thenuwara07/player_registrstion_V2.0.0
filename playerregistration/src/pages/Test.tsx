@@ -139,7 +139,6 @@ const SignUp = () => {
 
         // If you're maintaining formData state, update it properly
         handleInputChange("profilePictureName", tempProfileName);
-        console.log("Profile picture uploaded1111:", formData.profilePictureName);
 
         // Optionally, set it to a local state too
         // setProfileName(tempProfileName);
@@ -148,20 +147,17 @@ const SignUp = () => {
           ...formData,
           profilePictureName: tempProfileName,
         });
-        console.log("Profile picture uploaded2222:", formData.profilePictureName);
       } else {
         console.error("Image upload failed or returned no filename.");
       }
 
-      console.log("tempProfileName0000:", tempProfileName);
 
-      if (result.filename) {
+      if (result) {
         resetForm();
         toast.success("Registration successful!");
       } else {
         toast.error("Registration failed. Please try again.");
       }
-      console.log("Form Data:", formData);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -169,8 +165,6 @@ const SignUp = () => {
           : "An error occurred. Please try again."
       );
     } finally {
-      console.log("Form Data:", formData);
-      console.log("Previews:", previews);
       setIsLoading(false);
     }
   };

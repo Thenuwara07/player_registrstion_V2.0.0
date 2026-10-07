@@ -11,12 +11,6 @@ const PublicRoute = ({
 }) => {
   const { user, isLoading } = useAuth();
 
-  // If you use refresh-on-boot, wait until it finishes
-//   if (isLoading) {
-//     return <div className="flex items-center justify-center h-screen">Loading...</div>;
-//   }
-
-  // ✅ Already logged in → block signin/signup pages
   if (user) {
     return <Navigate to={redirectTo} replace />;
   }

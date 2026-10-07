@@ -62,12 +62,12 @@ import {
 import { RegRequest } from "@/types/index";
 import SearchableFreeTextClubInput from "../components/models/SearchableFreeTextClubInput";
 import { set } from "date-fns";
-import { validateClubChange } from "../validation/clubChangeValidator";
+import { validateClubChange, type ClubChangeData } from "../validation/clubChangeValidator";
 import ConfirmProfileModal, {
   ProfileData,
 } from "../components/models/ConfirmProfileModal";
 import type { DefaultDetails } from "@/types/authTypes";
-import { GetdeafaultDetails } from "@/api/postApi";
+import { GetdeafaultDetails } from "@/api/detailsApi";
 
 const IMG_URL = import.meta.env.VITE_IMG_URL as string;
 
@@ -351,7 +351,7 @@ const Profile = () => {
     height: currentUser?.player?.height,
   });
 
-  const [clubChangeData, setClubChangeData] = useState({
+  const [clubChangeData, setClubChangeData] = useState<ClubChangeData>({
     type: "",
     userId: "",
     currentClubId: null,
@@ -718,12 +718,12 @@ const Profile = () => {
     return null;
   };
 
-  // derive status + cooldown (Fixed Typo on "ChangeDate")
+  // Club change cooldown. The API field names keep the database's spelling.
   const openchangeDate = parseMaybeDate(
-    currentUser?.player?.openClubChangeDate
+    currentUser?.player?.openClubChagngeDate
   );
   const closechangeDate = parseMaybeDate(
-    currentUser?.player?.closeClubChangeDate
+    currentUser?.player?.closeClubChagngeDate
   );
 
   // Added optional chaining and fallback to prevent null reference crash
@@ -736,14 +736,6 @@ const Profile = () => {
     ? addMonths(closechangeDate, changePeriodMonths) > new Date()
     : false;
 
-//   return (
-//     <div>
-//       {/* Component UI Rendering Logic */}
-//     </div>
-//   );
-// };
-
-// export default Profile;
   return (
     <div className="min-h-screen bg-gray-50 sports-gradient pb-12">
       <div className="container mx-auto px-4 py-8 sports-gradient">

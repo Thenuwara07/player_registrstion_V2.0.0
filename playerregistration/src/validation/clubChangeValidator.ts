@@ -2,7 +2,7 @@ import {
   User1 } from "../types/index";
 
 export interface ClubChangeData {
-  type: "open" | "close";
+  type: "open" | "close" | ""; // "" until the player picks one
   userId: string | null;
   currentClubId: number | null;
   currentAssId: number | null;

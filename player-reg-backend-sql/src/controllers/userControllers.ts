@@ -1,35 +1,31 @@
+// Player self-service actions. These always act on the signed-in player
+// (from the token); any userId sent in the body is ignored.
 import { Request, Response } from "express";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
+import { sendServerError } from "../lib/http";
 import { logRequestActivity } from "../lib/activityLog";
 
-export const regRequest = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const { userId, slipImage, referenceNo } = req.body;
+// Routes using these handlers run authenticateToken first
+const currentUserId = (req: Request) => req.user!.id;
 
-    // Corrected validation
-    if (!userId || !slipImage || !referenceNo) {
+// POST /api/user/regrequest — submit a registration payment slip
+export const regRequest = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { slipImage, referenceNo } = req.body;
+
+    if (!slipImage || !referenceNo) {
       res.status(400).json({
         success: false,
-        message: "Missing required fields: userId or slipImage",
+        message: "Missing required fields: slipImage or referenceNo",
       });
       return;
     }
 
     const payment = await prisma.payment.create({
-      data: {
-        userId: parseInt(userId, 10),
-        referenceNo,
-        slipImage,
-      },
+      data: { userId: currentUserId(req), referenceNo, slipImage },
     });
-    logRequestActivity(
-      req,
-      `Submitted registration payment slip (Ref: ${referenceNo})`
-    );
+    logRequestActivity(req, `Submitted registration payment slip (Ref: ${referenceNo})`);
 
     res.status(201).json({
       success: true,
@@ -37,36 +33,40 @@ export const regRequest = async (
       data: payment,
     });
   } catch (error) {
-    console.error("Error creating payment record:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    sendServerError(res, error, "Error creating payment record");
   }
 };
 
-export const clubchangeRequest = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// POST /api/user/clubchange — request an open or close club change
+export const clubchangeRequest = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId, type, newImage, newClubId, newAssId, newClub, newAss, newClubCode, newAssCode, currentClubId, currentClubCode, currentAssId, currentAssCode,  currentImage, resignDate, currentClub, currentAss } = req.body;
+    const {
+      type,
+      newImage,
+      newClubId,
+      newAssId,
+      newClub,
+      newAss,
+      newClubCode,
+      newAssCode,
+      currentClubId,
+      currentClubCode,
+      currentAssId,
+      currentAssCode,
+      currentImage,
+      resignDate,
+      currentClub,
+      currentAss,
+    } = req.body;
 
-    // Validate input
-    if (!userId || !type || !newImage || !newAssId || !newAssCode) {
-      res.status(400).json({
-        success: false,
-        message: "Missing required fields!",
-      });
+    if (!type || !newImage || !newAssId || !newAssCode) {
+      res.status(400).json({ success: false, message: "Missing required fields!" });
       return;
     }
-    
 
-    // Create new club change request using `clubchange` model
-    console.log("Creating club change request for userId:", resignDate);
     const clubChange = await prisma.clubchange.create({
       data: {
-        userId: parseInt(userId, 10),
+        userId: currentUserId(req),
         type,
         oldAssId: currentAssId || null,
         oldAssName: currentAss || null,
@@ -75,21 +75,19 @@ export const clubchangeRequest = async (
         oldClubName: currentClub || null,
         oldClubCode: currentClubCode || null,
         oldImage: currentImage || null,
-        newAssId: newAssId,
+        newAssId,
         newAssName: newAss,
-        newAssCode: newAssCode,
+        newAssCode,
         newClubId: newClubId || null,
         newClubName: newClub || null,
         newClubCode: newClubCode || null,
         newImage,
-        resignDate: resignDate,
+        resignDate,
       },
     });
     logRequestActivity(
       req,
-      `Requested ${type} club change to ${newAss || newAssCode}${
-        newClub ? ` / ${newClub}` : ""
-      }`
+      `Requested ${type} club change to ${newAss || newAssCode}${newClub ? ` / ${newClub}` : ""}`
     );
 
     res.status(201).json({
@@ -98,112 +96,47 @@ export const clubchangeRequest = async (
       data: clubChange,
     });
   } catch (error) {
-    console.error("Error creating club change request:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    sendServerError(res, error, "Error creating club change request");
   }
 };
 
-export const updateUserAndPlayer = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const { userId, firstName, lastName, contact, email, height, weight } =
-      req.body;
-    // Validate input
-    if (!userId) {
-      res.status(400).json({
-        success: false,
-        message: "Missing required field: userId",
-      });
-      return;
-    }
+const toIntOrUndefined = (value: unknown) => (value ? parseInt(String(value), 10) : undefined);
 
-    // Update user and player together in a transaction
+// PUT /api/user/updateuserandplayer — edit own profile details
+export const updateUserAndPlayer = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = currentUserId(req);
+    const { firstName, lastName, contact, email, height, weight } = req.body;
+
     const [updatedUser, updatedPlayer] = await prisma.$transaction([
       prisma.user.update({
-        where: { id: parseInt(userId) },
-        data: {
-          firstName,
-          lastName,
-          contact,
-          email,
-        },
+        where: { id: userId },
+        data: { firstName, lastName, contact, email },
       }),
       prisma.player.update({
-        where: { userId: parseInt(userId) },
-        data: {
-          height: height ? parseInt(height) : undefined,
-          weight: weight ? parseInt(weight) : undefined,
-        },
+        where: { userId },
+        data: { height: toIntOrUndefined(height), weight: toIntOrUndefined(weight) },
       }),
     ]);
-    const changedFields = Object.entries({
-      firstName,
-      lastName,
-      contact,
-      email,
-      height,
-      weight,
-    })
+
+    const changedFields = Object.entries({ firstName, lastName, contact, email, height, weight })
       .filter(([, value]) => value !== undefined && value !== "")
       .map(([field]) => field);
-    logRequestActivity(
-      req,
-      `Updated profile details (${changedFields.join(", ") || "no fields"})`
-    );
+    logRequestActivity(req, `Updated profile details (${changedFields.join(", ") || "no fields"})`);
 
     res.status(200).json({
       success: true,
       message: "User and Player updated successfully.",
-      data: {
-        user: updatedUser,
-        player: updatedPlayer,
-      },
+      data: { user: updatedUser, player: updatedPlayer },
     });
   } catch (error) {
-    console.error("Error updating user and player:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
-
-export const defaultDetails = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    // associationId can come from params or query
-
-    let defaultDetails = await prisma.setting.findFirst({
-      where: { id: 1 }, // assuming there's only one row with id=1
-    });
-
-
-    res.status(200).json({
-      success: true,
-      data: defaultDetails,
-    });
-  } catch (error) {
-    console.error("Error fetching association:", error);
-
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       res.status(400).json({
         success: false,
-        error: "Database error",
-        code: error.code,
+        message: "This email is already used by another account",
       });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: "Internal server error",
-        message: (error as Error).message,
-      });
+      return;
     }
+    sendServerError(res, error, "Error updating user and player");
   }
 };

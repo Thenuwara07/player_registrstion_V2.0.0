@@ -114,7 +114,6 @@ const Players: React.FC = () => {
         setLoading(true);
         const resp: PlayersResponse = await getAllPlayers();
         setPlayers(resp.data); // store only the array
-        console.log("Fetched players data:", resp);
       } catch (error) {
         console.error(error);
         toast.error("Failed to load player details.");

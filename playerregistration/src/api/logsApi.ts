@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+import { apiRequest } from "./client";
 
 export type ActivityLog = {
   id: number;
@@ -28,20 +28,13 @@ export type ActivityLogsResponse = {
 export const getActivityLogs = async (
   filters: ActivityLogFilters = {}
 ): Promise<ActivityLogsResponse> => {
-  const token = sessionStorage.getItem("authToken");
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== "") params.set(key, String(value));
   });
 
-  const response = await fetch(`${API_BASE_URL}/admin/logs?${params}`, {
-    headers: {
-      "ngrok-skip-browser-warning": "true",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const json = await response.json().catch(() => ({}));
-  if (!response.ok || json.success === false) {
+  const json = await apiRequest(`/admin/logs?${params}`, { errorMessage: "Failed to load logs" });
+  if (json.success === false) {
     throw new Error(json.message || "Failed to load logs");
   }
   return json as ActivityLogsResponse;

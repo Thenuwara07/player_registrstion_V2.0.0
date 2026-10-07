@@ -299,12 +299,6 @@ const PostGrid: React.FC<{
             <CardHeader className="flex flex-row items-start justify-between">
               <div className="flex items-start gap-3">
                 {authorAvatar(p) ? (
-                  // <img
-                  //   src={authorAvatar(p)}
-                  //   alt={authorName(p)}
-                  //   className="w-9 h-9 rounded-full object-cover border"
-                  //   loading="lazy"
-                  // />
                   <p />
                 ) : (
                   // <div className="w-9 h-9 rounded-full border flex items-center justify-center">

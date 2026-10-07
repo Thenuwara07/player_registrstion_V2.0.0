@@ -45,7 +45,6 @@ const ConfirmProfileModal: React.FC<NewAdminConfirmModelProps> = ({
 
   const portalRoot = document.getElementById("modal-root") ?? document.body;
 
-  console.log("Confirm Modal Data:-----------------------------------", data);
 
   const display = (v: unknown): string => {
     if (v === null || v === undefined) return "no changes";

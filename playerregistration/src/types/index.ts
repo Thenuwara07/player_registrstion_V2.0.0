@@ -1,32 +1,8 @@
-
-// export interface User {
-//   id: string;
-//   email: string;
-//   firstName: string;
-//   lastName: string;
-//   fullName: string;
-//   dateOfBirth: string;
-//   district: string;
-//   province: string;
-//   idCardNumber: string;
-//   contactNumber: string;
-//   weight: number;
-//   height: number;
-//   profileImage?: string;
-//   idCardImage?: string;
-//   openClub?: string;
-//   closeClub?: string;
-//   registeredDate: string;
-//   expiryDate: string;
-//   status: 'pending' | 'confirmed' | 'rejected';
-//   role: 'player' | 'admin';
-// }
-
-import { stringify } from "querystring";
-
+// The signed-in user, as returned by POST /auth/signin
 export interface User {
   id: string;
-  firstname: string;
+  firstName: string;
+  email?: string;
   role: "superadmin" | "admin" | "player";
   status: "confirmed" | "banned" | "pending";
 }
